@@ -20,7 +20,8 @@ function searchImagesHundler(event) {
     .then(markup => addedMarkupItem(markup));
 }
 
-function loadImageHundler() {
+function loadImageHundler(event) {
+  event.preventDefault();
   galleryImage.incrementPage();
   galleryImage
     .searchImages()
@@ -28,7 +29,7 @@ function loadImageHundler() {
     .then(markup => addedMarkupItem(markup))
     .then(() => {
       window.scrollBy({
-        top: window.innerHeight + 600,
+        top: document.body.scrollHeight,
         left: 0,
         behavior: 'smooth',
       });
