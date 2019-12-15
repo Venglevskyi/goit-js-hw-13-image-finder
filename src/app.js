@@ -17,7 +17,8 @@ function searchImagesHundler(event) {
   galleryImage
     .searchImages()
     .then(({ data }) => creatMarkupItem(data.hits))
-    .then(markup => addedMarkupItem(markup));
+    .then(markup => addedMarkupItem(markup))
+    .catch(err => console.warn(err));
 }
 
 function loadImageHundler(event) {
@@ -51,15 +52,19 @@ function clearMarkupItem() {
   refs.gallery.innerHTML = '';
 }
 
-// function openModalWindow (event) {
-//   event.preventDefault();
-//   const target = event.target;
-//   galleryImage
-//     .searchImages()
-//     .then(data.map(e => e.hits.largeImageURL))
-//     .then (markup => ModalWindow(markup))
-// }
+function openModalWindow(event) {
+  event.preventDefault();
+  const target = event.target.src;
+  galleryImage
+    .searchImages()
+    .then(({ data }) => data.hits)
+    .then(img => {
+      const arrImg = img.map(e => e.largeImageURL)
+      return arrImg;
+    })
+    .then(img => ModalWindow(img))
+}
 
 refs.searchForm.addEventListener('input', debounce(searchImagesHundler, 500));
 refs.loadMoreBtn.addEventListener('click', loadImageHundler);
-// refs.gallery.addEventListener('click', openModalWindow);
+refs.gallery.addEventListener('click', openModalWindow);
