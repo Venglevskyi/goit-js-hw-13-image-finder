@@ -1,7 +1,8 @@
 const refs = {
-    searchInput: document.querySelector('#search_country'),
-    countryList: document.querySelector('.country_list-js'),
-    countryItem: document.querySelector('.country-js'),
-}
+  searchForm: document.querySelector('#search-form'),
+  gallery: document.querySelector('.js-gallery'),
+  photoCard: document.querySelector('.photo-card'),
+  loadMoreBtn: document.querySelector('button[data-action="Load more"]'),
+};
 
 export {refs};

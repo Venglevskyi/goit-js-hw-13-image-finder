@@ -1,38 +1,64 @@
 import { warning } from './utils/pnotify';
-
-import { fetchCountries, baseUrl, options } from './api/fetchCountries';
-import { refs } from './utils/refs';
 import debounce from 'lodash.debounce';
-import template from './templates/country-items.hbs';
+import { galleryImage } from './api/apiService';
+import { refs } from './utils/refs';
+import templateItemsImage from './templates/image-card.hbs';
+import { ModalWindow } from './utils/modalWindow';
 
-function findUniqueCountry(data) {
-  if (data.length > 10) {
-    warning();
-    refs.countryList.innerHTML = '';
-    refs.countryItem.innerHTML = '';
-  } else if (data.length >= 2 && data.length <= 10) {
-    const htmlMarkup = data
-      .map(e => `<li class="country-item country-list">${e.name}</li>`)
-      .join('\n');
-    refs.countryList.innerHTML = htmlMarkup;
-    refs.countryItem.innerHTML = '';
-  } else if (data.length === 1) {
-    const [country] = data;
-    refs.countryItem.innerHTML = template(country);
-    refs.countryList.innerHTML = '';
-  } 
-  return data;
-}
-
-function resultSearchCountry(event) {
+function searchImagesHundler(event) {
   event.preventDefault();
 
-  let inputValue = 'name/' + event.target.value.toLowerCase();
-  if (inputValue === 'name/') {
-    inputValue = '';
-  }
+  let inputValue = event.target.value.toLowerCase();
 
-  fetchCountries(baseUrl + inputValue, options).then(findUniqueCountry);
+  galleryImage.searchQuery = inputValue;
+
+  clearMarkupItem();
+
+  galleryImage
+    .searchImages()
+    .then(({ data }) => creatMarkupItem(data.hits))
+    .then(markup => addedMarkupItem(markup));
 }
 
-refs.searchInput.addEventListener('input', debounce(resultSearchCountry, 500));
+function loadImageHundler() {
+  galleryImage.incrementPage();
+  galleryImage
+    .searchImages()
+    .then(({ data }) => creatMarkupItem(data.hits))
+    .then(markup => addedMarkupItem(markup))
+    .then(() => {
+      window.scrollBy({
+        top: window.innerHeight + 600,
+        left: 0,
+        behavior: 'smooth',
+      });
+    });
+}
+
+function creatMarkupItem(items) {
+  if (items.length === 0) {
+    warning();
+  }
+  return templateItemsImage(items);
+}
+
+function addedMarkupItem(items) {
+  refs.gallery.insertAdjacentHTML('beforeend', items);
+}
+
+function clearMarkupItem() {
+  refs.gallery.innerHTML = '';
+}
+
+// function openModalWindow (event) {
+//   event.preventDefault();
+//   const target = event.target;
+//   galleryImage
+//     .searchImages()
+//     .then(data.map(e => e.hits.largeImageURL))
+//     .then (markup => ModalWindow(markup))
+// }
+
+refs.searchForm.addEventListener('input', debounce(searchImagesHundler, 500));
+refs.loadMoreBtn.addEventListener('click', loadImageHundler);
+// refs.gallery.addEventListener('click', openModalWindow);
