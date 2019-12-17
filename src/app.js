@@ -34,7 +34,7 @@ function loadImageHundler(event) {
     .then(({ data }) => creatMarkupItem(data.hits))
     .then(markup => addedMarkupItem(markup))
     .then(() => {
-      const scroling = window.innerHeight - refs.searchForm.offsetHeight;
+      const scroling = window.innerHeight - refs.searchForm.offsetHeight - 12;
       window.scrollBy({
         top: scroling,
         left: 0,
