@@ -6,6 +6,10 @@ import { galleryImage } from './api/apiService';
 import { refs } from './utils/refs';
 import templateItemsImage from './templates/image-card.hbs';
 
+function submitHundler(event) {
+  event.preventDefault();
+}
+
 function searchImagesHundler(event) {
   event.preventDefault();
 
@@ -30,8 +34,9 @@ function loadImageHundler(event) {
     .then(({ data }) => creatMarkupItem(data.hits))
     .then(markup => addedMarkupItem(markup))
     .then(() => {
+      const scroling = window.innerHeight - refs.searchForm.offsetHeight;
       window.scrollBy({
-        top: document.body.scrollHeight,
+        top: scroling,
         left: 0,
         behavior: 'smooth',
       });
@@ -54,11 +59,8 @@ function clearMarkupItem() {
 }
 
 function openLightboxWindow(event) {
-  event.preventDefault();
-
   if (event.target.tagName !== 'IMG') return;
 
-  refs.gallery.classList.add('modal');
   const largeImg = event.target.dataset.source;
   const discription = event.target.alt;
   LightboxWindow(largeImg, discription);
@@ -71,19 +73,17 @@ function openLightboxWindow(event) {
 
 function closeLightboxWindowByEsc({ keyCode }) {
   if (keyCode === 27) {
-    window.removeEventListener('keydown', closeLightboxWindowByEsc);
-    refs.gallery.classList.remove('modal');
     instance.close();
+    window.removeEventListener('keydown', closeLightboxWindowByEsc);
   }
 }
 
 function closeOnClickWithBg({ target, currentTarget }) {
-  console.log(target);
   if (target !== currentTarget) return;
-  refs.gallery.classList.remove('modal');
   instance.close();
 }
 
 refs.searchForm.addEventListener('input', debounce(searchImagesHundler, 500));
+refs.searchForm.addEventListener('submit', submitHundler);
 refs.loadMoreBtn.addEventListener('click', loadImageHundler);
 refs.gallery.addEventListener('click', openLightboxWindow);
